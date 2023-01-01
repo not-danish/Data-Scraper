@@ -28,7 +28,7 @@ def fields(rows) -> list:
   for row in rows:
     cells = row.find_all('th')
     for cell in cells:
-      field_list.append(cell.text)
+      field_list.append(cell.text.strip())
   return field_list
 
 def get_data(rows) -> list:
@@ -43,7 +43,7 @@ def get_data(rows) -> list:
 
     index = 0
     for cell in cells:
-      column_dict[columns[index]] = cell.text 
+      column_dict[columns[index]] = cell.text.strip() 
       index += 1
       index = index % len(columns)
       if index == 0:
