@@ -1,5 +1,6 @@
-import requests
 from bs4 import BeautifulSoup
+import requests
+import csv
 
 def make_request(link: str):
   # Make a request to the webpage
@@ -29,3 +30,37 @@ def fields(rows) -> list:
     for cell in cells:
       field_list.append(cell.text)
   return field_list
+
+def get_data(rows) -> list:
+  column_dict = {}
+  data_list = []
+  columns = fields(rows)
+  for column in columns:
+    column_dict[column] = ''
+
+  for row in rows:
+    cells = row.find_all('td')
+
+    index = 0
+    for cell in cells:
+      column_dict[columns[index]] = cell.text 
+      index += 1
+      index = index % len(columns)
+      if index == 0:
+        column_dict = {}
+        data_list.append(column_dict)
+  return data_list
+
+def data_to_csv(rows, filename: str):
+  columns = fields(rows)
+  data = get_data(rows)
+  if columns == None:
+    print("Error: Can't create a csv from an empty list.")
+    return None
+  try:
+      with open(filename, 'w') as csvfile:
+          writer = csv.DictWriter(csvfile, fieldnames=columns)
+          writer.writeheader()  
+          writer.writerows(data)
+  except IOError:
+      print("I/O error")
